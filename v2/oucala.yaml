@@ -1,0 +1,144 @@
+#
+# Example: https://raw.githubusercontent.com/Hedde/k8s-traefik-example/master/resource-manifests/service-one.yml
+#
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: org-oucala-back-deployment 
+  labels:
+    env: main 
+    app: org-oucala-back 
+    layer: back 
+spec:
+  replicas: 1 
+  selector:
+    matchLabels:
+      app: org-oucala-back 
+  template:
+    metadata:
+      labels:
+        app: org-oucala-back 
+    spec:
+      containers:
+      - image: deepnox/org-oucala-back:0.0.1 
+        imagePullPolicy: Always 
+        name: org-oucala-back 
+        command: ["/opt/entrypoint.bash"]
+        args: ["run", "npm", "start"]
+        env:
+          - name: DATABASE_URL
+            value: mongodb://org-oucala-db:27017/oucala 
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: org-oucala-app-deployment 
+  labels:
+    env: main 
+    app: org-oucala-app 
+    layer: front 
+spec:
+  replicas: 1 
+  selector:
+    matchLabels:
+      app: org-oucala-app 
+  template:
+    metadata:
+      labels:
+        app: org-oucala-app 
+    spec:
+      containers:
+      - image: deepnox/org-oucala-app:0.0.1 
+        imagePullPolicy: Always 
+        name: org-oucala-app
+        command: ["/opt/entrypoint.bash"]
+        args: ["run", "npm", "start"]
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: org-oucala-db-deployment 
+  labels:
+    env: main 
+    app: org-oucala-db 
+    layer: db 
+spec:
+  replicas: 1 
+  selector:
+    matchLabels:
+      app: org-oucala-db 
+  template:
+    metadata:
+      labels:
+        app: org-oucala-db 
+    spec:
+      containers:
+      - image: docker.io/mongo:6.0.7
+        imagePullPolicy: Always 
+        name: org-oucala-db
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: org-oucala-back-service
+  labels:
+    env: main
+    app: org-oucala-back
+    layer: back
+spec:
+  ports:
+  - name: http
+    targetPort: 8080 
+    port: 8080
+  selector:
+    app: org-oucala-back
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: org-oucala-app-service
+  labels:
+    env: main
+    app: org-oucala-app
+    layer: front 
+spec:
+  ports:
+  - name: http
+    targetPort: 3000 
+    port: 3000 
+  selector:
+    app: org-oucala-app
+---
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: route-org-oucala-www 
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - match: Host(`www.oucala.org`) 
+      kind: Rule
+      services:
+        - name: org-oucala-app-service 
+          kind: Service
+          port: 3000
+  tls:
+    certResolver: letsencrypt 
+---
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: route-org-oucala-back 
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - match: Host(`api.oucala.org`) 
+      kind: Rule
+      services:
+        - name: org-oucala-back-service 
+          kind: Service
+          port: 8080
+  tls:
+    certResolver: letsencrypt 
