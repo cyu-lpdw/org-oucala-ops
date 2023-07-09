@@ -1,0 +1,122 @@
+#
+# Example: https://raw.githubusercontent.com/Hedde/k8s-traefik-example/master/resource-manifests/service-one.yml
+#
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: org-oucala-back-deployment 
+  labels:
+    env: main 
+    app: org-oucala-back 
+    layer: back 
+spec:
+  replicas: 1 
+  selector:
+    matchLabels:
+      app: org-oucala-back 
+  template:
+    metadata:
+      labels:
+        app: org-oucala-back 
+    spec:
+      containers:
+      - image: deepnox/org-oucala-back:0.0.1 
+        imagePullPolicy: Always 
+        name: org-oucala-back 
+        command: ["/opt/entrypoint.bash"]
+        args: ["run", "npm", "start"]
+        env:
+          - name: DATABASE_URL
+            value: mongodb://org-oucala-db:27017/oucala 
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: org-oucala-app-deployment 
+  labels:
+    env: main 
+    app: org-oucala-app 
+    layer: front 
+spec:
+  replicas: 1 
+  selector:
+    matchLabels:
+      app: org-oucala-app 
+  template:
+    metadata:
+      labels:
+        app: org-oucala-app 
+    spec:
+      containers:
+      - image: deepnox/org-oucala-app:0.0.1 
+        imagePullPolicy: Always 
+        name: org-oucala-app
+        command: ["/opt/entrypoint.bash"]
+        args: ["run", "npm", "start"]
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: org-oucala-db-deployment 
+  labels:
+    env: main 
+    app: org-oucala-db 
+    layer: db 
+spec:
+  replicas: 1 
+  selector:
+    matchLabels:
+      app: org-oucala-db 
+  template:
+    metadata:
+      labels:
+        app: org-oucala-db 
+    spec:
+      containers:
+      - image: docker.io/mongo:6.0.7
+        imagePullPolicy: Always 
+        name: org-oucala-db
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: org-oucala-back-service
+  labels:
+    env: main
+    app: org-oucala-back
+    layer: back
+spec:
+  ports:
+  - name: http
+    targetPort: 8080 
+    port: 8080
+  selector:
+    app: org-oucala-back
+---
+apiVersion: networking.k8s.io/v1 
+kind: Ingress
+metadata:
+  name: org-oucala-back-ingress
+  annotations:
+    kubernetes.io/ingress.class: traefik
+    traefik.ingress.kubernetes.io/router.entrypoints: websecure
+    #traefik.ingress.kubernetes.io/router.middlewares: dev-test-auth@kubernetescrd
+  labels:
+    env: main
+    app: org-oucala-back
+    layer: back
+
+spec:
+  rules:
+  - host: api.oucala.org 
+    http:
+      paths:
+      - path: /
+        pathType: Prefix 
+        backend:
+          service:
+            name: org-oucala-back-service
+            port:
+              number: 8080
+ 
+

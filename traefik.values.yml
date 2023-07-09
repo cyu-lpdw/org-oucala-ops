@@ -1,0 +1,32 @@
+---
+providers:
+  kubernetesCRD:
+    namespaces:
+      - default
+      - traefik
+  kubernetesIngress:
+    namespaces:
+      - default
+      - traefik
+
+dashboard:
+  enabled: true
+  domain: traefik.monitoring.internal.oucala.org 
+rbac:
+  enabled: true
+kubernetes:
+  namespaces:
+    - default
+    - kube-system
+
+additionalArguments:
+  - "--entrypoints.web.address=:8000"
+  - "--entrypoints.web.http.redirections.entryPoint.to=websecure"
+  - "--entrypoints.web.http.redirections.entryPoint.scheme=https"
+  - "--entrypoints.web.http.redirections.entrypoint.permanent=true"
+  - "--entrypoints.websecure.address=:8443"
+  - "--log.level=DEBUG"
+  - "--certificatesresolvers.le.acme.email=contact@example.com"
+  - "--certificatesresolvers.le.acme.storage=/data/acme.json"
+  - "--certificatesresolvers.le.acme.tlschallenge=true"
+  - "--certificatesresolvers.le.acme.caServer=https://acme-staging-v02.api.letsencrypt.org/directory"
