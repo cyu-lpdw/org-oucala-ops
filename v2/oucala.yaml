@@ -25,6 +25,8 @@ spec:
         name: org-oucala-back 
         command: ["/opt/entrypoint.bash"]
         args: ["run", "npm", "start"]
+        ports: 
+          - containerPort: 8080 
         env:
           - name: DATABASE_URL
             value: mongodb://org-oucala-db:27017/oucala 
@@ -53,6 +55,8 @@ spec:
         name: org-oucala-app
         command: ["/opt/entrypoint.bash"]
         args: ["run", "npm", "start"]
+        ports: 
+          - containerPort: 3000 
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -87,9 +91,8 @@ metadata:
     layer: back
 spec:
   ports:
-  - name: http
-    targetPort: 8080 
-    port: 8080
+    - port: 8080
+      protocol: TCP
   selector:
     app: org-oucala-back
 ---
@@ -103,9 +106,8 @@ metadata:
     layer: front 
 spec:
   ports:
-  - name: http
-    targetPort: 3000 
-    port: 3000 
+    - port: 3000 
+      protocol: TCP 
   selector:
     app: org-oucala-app
 ---
@@ -115,6 +117,7 @@ metadata:
   name: route-org-oucala-www 
 spec:
   entryPoints:
+    - web
     - websecure
   routes:
     - match: Host(`www.oucala.org`) 
@@ -132,6 +135,7 @@ metadata:
   name: route-org-oucala-back 
 spec:
   entryPoints:
+    - web
     - websecure
   routes:
     - match: Host(`api.oucala.org`) 

@@ -520,8 +520,11 @@ additionalArguments:
   - --certificatesresolvers.letsencrypt.acme.storage=/data/acme.json
   - --certificatesresolvers.letsencrypt.acme.caserver=https://acme-v02.api.letsencrypt.org/directory
 
+
 # -- Environment variables to be passed to Traefik's binary
-env: []
+env: 
+  - name: TRAEFIK_ENTRYPOINTS_WEB_HTTP_REDIRECTIONS_ENTRYPOINT_TO
+    value: websecure  
 # - name: SOME_VAR
 #   value: some-var-value
 # - name: SOME_VAR_FROM_CONFIG_MAP
@@ -578,7 +581,7 @@ ports:
     ## -- Enable this entrypoint as a default entrypoint. When a service doesn't explicity set an entrypoint it will only use this entrypoint.
     # asDefault: true
     port: 8000
-    # hostPort: 8000
+    #hostPort: 8000
     # containerPort: 8000
     expose: true
     exposedPort: 80
@@ -607,7 +610,7 @@ ports:
     ## -- Enable this entrypoint as a default entrypoint. When a service doesn't explicity set an entrypoint it will only use this entrypoint.
     # asDefault: true
     port: 8443
-    # hostPort: 8443
+    #hostPort: 8443
     # containerPort: 8443
     expose: true
     exposedPort: 443
@@ -728,7 +731,8 @@ service:
     # - 172.16.0.0/16
   ## -- Class of the load balancer implementation
   # loadBalancerClass: service.k8s.aws/nlb
-  externalIPs: []
+  externalIPs: 
+    - 192.168.240.10
     # - 1.2.3.4
   ## One of SingleStack, PreferDualStack, or RequireDualStack.
   # ipFamilyPolicy: SingleStack
