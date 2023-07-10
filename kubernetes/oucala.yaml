@@ -82,6 +82,13 @@ spec:
         name: org-oucala-db
         ports: 
           - containerPort: 27017 
+        volumeMounts:  
+          - name: main-pv-org-oucala-db 
+            mountPath: /data/db
+      volumes:
+        - name: main-pv-org-oucala-db 
+          persistentVolumeClaim:
+            claimName: main-pvc-org-oucala-db 
 ---
 apiVersion: v1
 kind: Service
