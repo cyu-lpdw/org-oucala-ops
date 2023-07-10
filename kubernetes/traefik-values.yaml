@@ -519,12 +519,19 @@ additionalArguments:
   - --certificatesresolvers.letsencrypt.acme.email=francois-xavier.michaud@cyu.fr
   - --certificatesresolvers.letsencrypt.acme.storage=/data/acme.json
   - --certificatesresolvers.letsencrypt.acme.caserver=https://acme-v02.api.letsencrypt.org/directory
+  - "--certificatesresolvers.letsencrypt.acme.httpchallenge.entrypoint=web"
+  - --api.dashboard=true
+  - --ping=true
+  - --providers.kubernetescrd
+  - --providers.kubernetesingress
 
 
 # -- Environment variables to be passed to Traefik's binary
 env: 
   - name: TRAEFIK_ENTRYPOINTS_WEB_HTTP_REDIRECTIONS_ENTRYPOINT_TO
     value: websecure  
+  - name: TRAEFIK_HOSTRESOLVER
+    value: 'true'
 # - name: SOME_VAR
 #   value: some-var-value
 # - name: SOME_VAR_FROM_CONFIG_MAP
@@ -595,7 +602,7 @@ ports:
     # Port Redirections
     # Added in 2.2, you can make permanent redirects via entrypoints.
     # https://docs.traefik.io/routing/entrypoints/#redirection
-    # redirectTo: websecure
+    redirectTo: websecure
     #
     # Trust forwarded  headers information (X-Forwarded-*).
     # forwardedHeaders:
@@ -797,10 +804,10 @@ persistence:
 
 # -- Certificates resolvers configuration
 certResolvers: {}
-#   letsencrypt:
-#     # for challenge options cf. https://doc.traefik.io/traefik/https/acme/
-#     email: email@example.com
-#     dnsChallenge:
+#  letsencrypt:
+    # for challenge options cf. https://doc.traefik.io/traefik/https/acme/
+#    email: francois-xavier.michaud@cyu.fr
+#    dnsChallenge:
 #       # also add the provider's required configuration under env
 #       # or expand then from secrets/configmaps with envfrom
 #       # cf. https://doc.traefik.io/traefik/https/acme/#providers
@@ -809,11 +816,11 @@ certResolvers: {}
 #       # cf. https://doc.traefik.io/traefik/https/acme/#dnschallenge
 #       delayBeforeCheck: 30
 #       resolvers:
-#         - 1.1.1.1
+#         - 192.168.240.1 
 #         - 8.8.8.8
 #     tlsChallenge: true
-#     httpChallenge:
-#       entryPoint: "web"
+#      httpChallenge:
+#        entryPoint: "web"
 #     # It has to match the path with a persistent volume
 #     storage: /data/acme.json
 

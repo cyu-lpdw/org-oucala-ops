@@ -120,7 +120,7 @@ spec:
     - web
     - websecure
   routes:
-    - match: Host(`www.oucala.org`) 
+    - match: Host(`www.oucala.org`, `oucala.org`) 
       kind: Rule
       services:
         - name: org-oucala-app-service 
