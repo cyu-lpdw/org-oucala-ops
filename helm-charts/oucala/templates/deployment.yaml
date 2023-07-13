@@ -1,122 +1,122 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "application.fullname" . }}
+  name: {{ include "stacks.back.name" . }}
   labels:
-    {{- include "application.labels" . | nindent 4 }}
-#  name: org-oucala-back-deployment
+    {{- include "stacks.back.metadata.labels" . | nindent 4 }}
+    app: {{ include "stacks.back.name" . }}
+    layer: back
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: {{ include "stacks.back.name" . }}
+  template:
+    metadata:
+      labels:
+        app: {{ include "stacks.back.name" . }}
+    spec:
+      containers:
+      - image: {{ include "stacks.back.image.fullname" . }}
+        imagePullPolicy: {{ .Values.stacks.back.image.imagePullPolicy }}
+        name: {{ include "stacks.back.name" . }}
+        command: {{- .Values.stacks.back.image.command . | nindent 10 }}
+        args: {{- .Values.stacks.back.image.args . | nindent 10 }}
+        ports:
+          - containerPort: {{ .Values.stacks.back.image.ports.containerPort }}
+        env:
+          {{- if .Values.stacks.back.image.env }}
+          {{- toYaml .Values.stacks.back.image.env | indent 10 }}
+          {{- end }}
+
+#
+#---
+#apiVersion: apps/v1
+#kind: Deployment
+#metadata:
+#  name: org-oucala-app-deployment
 #  labels:
 #    env: main
-#    app: org-oucala-back
-#    layer: back
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: org-oucala-back
-  template:
-    metadata:
-      labels:
-        app: org-oucala-back
-    spec:
-      containers:
-      - image: deepnox/org-oucala-back:0.0.1
-        imagePullPolicy: Always
-        name: org-oucala-back
-        command: ["/opt/entrypoint.bash"]
-        args: ["run", "npm", "start"]
-        ports:
-          - containerPort: 8080
-        env:
-          - name: DATABASE_URL
-            value: mongodb://org-oucala-db:27017/oucala
----
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: org-oucala-app-deployment
-  labels:
-    env: main
-    app: org-oucala-app
-    layer: front
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: org-oucala-app
-  template:
-    metadata:
-      labels:
-        app: org-oucala-app
-    spec:
-      containers:
-      - image: deepnox/org-oucala-app:0.0.1
-        imagePullPolicy: Always
-        name: org-oucala-app
-        command: ["/opt/entrypoint.bash"]
-        args: ["run", "npm", "start"]
-        ports:
-          - containerPort: 3000
----
-# --- ORIGINAL
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: {{ include "application.fullname" . }}
-  labels:
-    {{- include "application.labels" . | nindent 4 }}
-spec:
-  {{- if not .Values.autoscaling.enabled }}
-  replicas: {{ .Values.replicaCount }}
-  {{- end }}
-  selector:
-    matchLabels:
-      {{- include "application.selectorLabels" . | nindent 6 }}
-  template:
-    metadata:
-      {{- with .Values.podAnnotations }}
-      annotations:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
-      labels:
-        {{- include "application.selectorLabels" . | nindent 8 }}
-    spec:
-      {{- with .Values.imagePullSecrets }}
-      imagePullSecrets:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
-      serviceAccountName: {{ include "application.serviceAccountName" . }}
-      securityContext:
-        {{- toYaml .Values.podSecurityContext | nindent 8 }}
-      containers:
-        - name: {{ .Chart.Name }}
-          securityContext:
-            {{- toYaml .Values.securityContext | nindent 12 }}
-          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
-          imagePullPolicy: {{ .Values.image.pullPolicy }}
-          ports:
-            - name: http
-              containerPort: {{ .Values.service.port }}
-              protocol: TCP
-          livenessProbe:
-            httpGet:
-              path: /
-              port: http
-          readinessProbe:
-            httpGet:
-              path: /
-              port: http
-          resources:
-            {{- toYaml .Values.resources | nindent 12 }}
-      {{- with .Values.nodeSelector }}
-      nodeSelector:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
-      {{- with .Values.affinity }}
-      affinity:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
-      {{- with .Values.tolerations }}
-      tolerations:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
+#    app: org-oucala-app
+#    layer: front
+#spec:
+#  replicas: 1
+#  selector:
+#    matchLabels:
+#      app: org-oucala-app
+#  template:
+#    metadata:
+#      labels:
+#        app: org-oucala-app
+#    spec:
+#      containers:
+#      - image: deepnox/org-oucala-app:0.0.1
+#        imagePullPolicy: {{ .Values.stacks.back.image.imagePullPolicy }}
+#        name: org-oucala-app
+#        command: ["/opt/entrypoint.bash"]
+#        args: ["run", "npm", "start"]
+#        ports:
+#          - containerPort: 3000
+#---
+## --- ORIGINAL
+#apiVersion: apps/v1
+#kind: Deployment
+#metadata:
+#  name: {{ include "stacks.fullname" . }}
+#  labels:
+#    {{- include "stacks.labels" . | nindent 4 }}
+#spec:
+#  {{- if not .Values.autoscaling.enabled }}
+#  replicas: {{ .Values.replicaCount }}
+#  {{- end }}
+#  selector:
+#    matchLabels:
+#      {{- include "stacks.selectorLabels" . | nindent 6 }}
+#  template:
+#    metadata:
+#      {{- with .Values.podAnnotations }}
+#      annotations:
+#        {{- toYaml . | nindent 8 }}
+#      {{- end }}
+#      labels:
+#        {{- include "stacks.selectorLabels" . | nindent 8 }}
+#    spec:
+#      {{- with .Values.imagePullSecrets }}
+#      imagePullSecrets:
+#        {{- toYaml . | nindent 8 }}
+#      {{- end }}
+#      serviceAccountName: {{ include "stacks.serviceAccountName" . }}
+#      securityContext:
+#        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+#      containers:
+#        - name: {{ .Chart.Name }}
+#          securityContext:
+#            {{- toYaml .Values.securityContext | nindent 12 }}
+#          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+#          imagePullPolicy: {{ .Values.image.pullPolicy }}
+#          ports:
+#            - name: http
+#              containerPort: {{ .Values.service.port }}
+#              protocol: TCP
+#          livenessProbe:
+#            httpGet:
+#              path: /
+#              port: http
+#          readinessProbe:
+#            httpGet:
+#              path: /
+#              port: http
+#          resources:
+#            {{- toYaml .Values.resources | nindent 12 }}
+#      {{- with .Values.nodeSelector }}
+#      nodeSelector:
+#        {{- toYaml . | nindent 8 }}
+#      {{- end }}
+#      {{- with .Values.affinity }}
+#      affinity:
+#        {{- toYaml . | nindent 8 }}
+#      {{- end }}
+#      {{- with .Values.tolerations }}
+#      tolerations:
+#        {{- toYaml . | nindent 8 }}
+#      {{- end }}

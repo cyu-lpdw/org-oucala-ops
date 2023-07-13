@@ -1,4 +1,4 @@
-# Default values for application.
+# Default values for stack.
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
@@ -80,3 +80,45 @@ nodeSelector: {}
 tolerations: []
 
 affinity: {}
+
+stacks:
+  back:
+    prefix: back
+    image:
+      provider: docker.io
+      organization: deepnox
+      image: org-oucala-back
+      tag: 0.0.1
+      imagePullPolicy: Always
+      command:
+      - /opt/entrypoint.bash
+      args:
+      - npm
+      - run
+      - start
+      ports:
+        containerPort: 8080
+      env:
+        - name: DATABASE_URL
+          value: mongodb://org-oucala-db:27017/oucala
+    metadata:
+      labels:
+        env: dev
+
+  front:
+    prefix: app
+    image:
+      provider: docker.io
+      organization: deepnox
+      image: org-oucala-app
+      tag: 0.0.1
+      imagePullPolicy: Always
+      command:
+      - /opt/entrypoint.bash
+      args:
+      - npm
+      - run
+      - start
+    metadata:
+      labels:
+        env: dev
