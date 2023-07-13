@@ -1,16 +1,77 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "oucala.fullname" . }}
+  name: {{ include "application.fullname" . }}
   labels:
-    {{- include "oucala.labels" . | nindent 4 }}
+    {{- include "application.labels" . | nindent 4 }}
+#  name: org-oucala-back-deployment
+#  labels:
+#    env: main
+#    app: org-oucala-back
+#    layer: back
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: org-oucala-back
+  template:
+    metadata:
+      labels:
+        app: org-oucala-back
+    spec:
+      containers:
+      - image: deepnox/org-oucala-back:0.0.1
+        imagePullPolicy: Always
+        name: org-oucala-back
+        command: ["/opt/entrypoint.bash"]
+        args: ["run", "npm", "start"]
+        ports:
+          - containerPort: 8080
+        env:
+          - name: DATABASE_URL
+            value: mongodb://org-oucala-db:27017/oucala
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: org-oucala-app-deployment
+  labels:
+    env: main
+    app: org-oucala-app
+    layer: front
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: org-oucala-app
+  template:
+    metadata:
+      labels:
+        app: org-oucala-app
+    spec:
+      containers:
+      - image: deepnox/org-oucala-app:0.0.1
+        imagePullPolicy: Always
+        name: org-oucala-app
+        command: ["/opt/entrypoint.bash"]
+        args: ["run", "npm", "start"]
+        ports:
+          - containerPort: 3000
+---
+# --- ORIGINAL
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "application.fullname" . }}
+  labels:
+    {{- include "application.labels" . | nindent 4 }}
 spec:
   {{- if not .Values.autoscaling.enabled }}
   replicas: {{ .Values.replicaCount }}
   {{- end }}
   selector:
     matchLabels:
-      {{- include "oucala.selectorLabels" . | nindent 6 }}
+      {{- include "application.selectorLabels" . | nindent 6 }}
   template:
     metadata:
       {{- with .Values.podAnnotations }}
@@ -18,13 +79,13 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       labels:
-        {{- include "oucala.selectorLabels" . | nindent 8 }}
+        {{- include "application.selectorLabels" . | nindent 8 }}
     spec:
       {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      serviceAccountName: {{ include "oucala.serviceAccountName" . }}
+      serviceAccountName: {{ include "application.serviceAccountName" . }}
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
       containers:
