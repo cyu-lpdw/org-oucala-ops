@@ -81,21 +81,19 @@ tolerations: []
 
 affinity: {}
 
+env: dev
+
 stacks:
   back:
-    prefix: back
+    suffix: back
     image:
       provider: docker.io
       organization: deepnox
-      image: org-oucala-back
+      name: org-oucala-back
       tag: 0.0.1
       imagePullPolicy: Always
-      command:
-      - /opt/entrypoint.bash
-      args:
-      - npm
-      - run
-      - start
+      command: ["/opt/entrypoint.bash"]
+      args: ["npm", "run", "start"]
       ports:
         containerPort: 8080
       env:
@@ -106,11 +104,11 @@ stacks:
         env: dev
 
   front:
-    prefix: app
+    suffix: app
     image:
       provider: docker.io
       organization: deepnox
-      image: org-oucala-app
+      name: org-oucala-app
       tag: 0.0.1
       imagePullPolicy: Always
       command:
