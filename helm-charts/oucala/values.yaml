@@ -85,6 +85,7 @@ env: dev
 
 stacks:
   back:
+    name: org-oucala-back
     suffix: back
     image:
       provider: docker.io

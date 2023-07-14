@@ -1,34 +1,44 @@
+{{- $top := . -}}
+{{- $namespace := .Release.Namespace -}}
+{{- range $stack, $values := $top.Values.stacks }}
+---
+{{- $stackName := include "stack.name" (list $top $stack) }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "stacks.back.name" . }}
+  name: {{ $stackName }}
   labels:
     {{- /* - include "stacks.back.metadata.labels" . | nindent 4 */}}
-    app: {{ include "stacks.back.name" . }}
-    layer: back
+    app: {{ $stackName }}
+    layer: {{ include "stack.settings" (list $top $stack) }}
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: {{ include "stacks.back.name" . }}
+      app: {{ $stackName }}
   template:
     metadata:
       labels:
-        app: {{ include "stacks.back.name" . }}
+        app: {{ $stackName }}
     spec:
       containers:
-      - image: {{ include "stacks.back.image.fullname" . }}
-        imagePullPolicy: {{ .Values.stacks.back.image.imagePullPolicy }}
-        name: {{ include "stacks.back.name" . }}
-        {{- if .Values.stacks.back.image.command }}
-        command: {{ toYaml .Values.stacks.back.image.command | nindent 10 }}
+      - image: {{ $values.image.name }}
+        imagePullPolicy: {{ $values.image.imagePullPolicy }}
+        name: {{ $stackName }}
+        {{- if $values.image.command }}
+        command: {{ toYaml $values.image.command | nindent 10 }}
         {{- end }}
-        {{- if .Values.stacks.back.image.args }}
-        args: {{ .Values.stacks.back.image.args | toYaml | nindent 10 }}
+        {{- if $values.image.args }}
+        args: {{ $values.image.args | toYaml | nindent 10 }}
         {{- end }}
+        {{- if $values.image.ports }}
         ports:
-          - containerPort: {{ .Values.stacks.back.image.ports.containerPort }}
-        env:
-          {{- if .Values.stacks.back.image.env }}
-          {{- .Values.stacks.back.image.env | toYaml | nindent 10 }}
+          {{- if $values.image.ports.containerPort }}
+          - containerPort: {{ $values.image.ports.containerPort }}
           {{- end }}
+        {{- end }}
+        {{- if $values.image.env }}
+        env:
+          {{- $values.image.env | toYaml | nindent 10 }}
+       {{- end }}
+{{- end }}
