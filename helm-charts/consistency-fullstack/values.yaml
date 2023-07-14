@@ -103,6 +103,8 @@ stacks:
     metadata:
       labels:
         env: dev
+    spec:
+      replicas: 1
 
   front:
     suffix: app
@@ -121,3 +123,15 @@ stacks:
     metadata:
       labels:
         env: dev
+    spec:
+      replicas: 1
+
+database:
+  settings:
+    type: mongo
+  image:
+    env:
+      secrets: mongo-creds
+    volumeMounts:
+  volumes:
+    - ...
