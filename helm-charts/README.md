@@ -20,6 +20,7 @@
 * [Build](#build)
 * [Tests](#tests)
 * [Compatibility](#compatibility)
+* [History](#history)
 * [Issues](#issues)
 * [Found a bug?](#found-a-bug)
 * [Contributing](#contributing)
@@ -101,6 +102,10 @@ helm template --debug standard-fullstack/
 ## <a name="compatibility" /> Compatibility
 
 `@todo`
+
+## <a name="history" /> History
+
+Please refer to [CHANGELOG](./CHANGELOG.md)
 
 ## <a name="issues"> Issues
 
