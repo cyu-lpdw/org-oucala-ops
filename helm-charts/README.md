@@ -101,7 +101,11 @@ helm template --debug consistency-fullstack/
 
 ## <a name="compatibility" /> Compatibility
 
-`@todo`
+Tested using:
+
+- MicroK8S v1.27.2
+- Helm v3.12.1
+- Kubectl v1.26.0
 
 ## <a name="history" /> History
 
