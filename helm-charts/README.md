@@ -96,7 +96,7 @@ kubectl create -f mongodb-pvc.yaml
 You can test your chart and visualize generated Kubernetes YAML file using default or provided values:
 
 ```shell
-helm template --debug standard-fullstack/
+helm template --debug consistency-fullstack/
 ```
 
 ## <a name="compatibility" /> Compatibility
