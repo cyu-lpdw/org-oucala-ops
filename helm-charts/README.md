@@ -23,6 +23,7 @@
 * [Issues](#issues)
 * [Found a bug?](#found-a-bug)
 * [Contributing](#contributing)
+* [Resources](#resources)
 * [Credits](#credits)
 * [❤️ Support our work!](#support-out-work)
 * [History](#history)
@@ -36,7 +37,54 @@ A generic Helm chart to deploy: a frontend app, a backend app and a database.
 
 ### <a name="requirements-secretstore" /> Create a secret to store security settings of the database
 
+Create a file named `mongo-secrets.yaml` containing:
+
+```yaml
+---
+apiVersion: v1
+data:
+  password: cGFzc3dvcmQxMjM= //password123
+  username: YWRtaW51c2Vy //adminuser
+kind: Secret
+metadata:
+  creationTimestamp: null
+  name: mongo-creds
+```
+
+Then create the secrets in your Kubernetes cluster:
+
+```shell
+kubectl apply -f mongodb-secrets.yaml
+```
+
 ### <a name="requirements-volume" /> Create a volume to persist your configuration and various data
+
+**Warning ! You must have previously created a persistent volume on your Kubernetes cluster!** (`pv` in the following example). 
+
+Create a YAML file (`mongo-pvc.yaml`) containing:
+
+```yaml
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: pvc
+spec:
+  storageClassName: ""
+  accessModes:
+    - ReadWriteOnce 
+  volumeName: pv
+  resources:
+    requests:
+      storage: 1Gi
+```
+
+Apply this to Kubernetes:
+
+```shell
+kubectl create -f mongodb-pvc.yaml
+```
+
 
 ## <a name="basic-usage" /> Basic usage
 
@@ -78,7 +126,13 @@ Please refer to project's style guidelines and guidelines for submitting patches
 
 **NOTE**: Be sure to merge the latest from "upstream" before making a pull request!
 
+## <a name="resources" /> Resources
+
+- [How To Deploy MongoDB on Kubernetes – Beginners Guide](https://devopscube.com/deploy-mongodb-kubernetes/)
+
 ## <a name="credits" /> Credits
+
+- [Bibin Wilson](https://devopscube.com/author/bibinwilson/)
 
 ## <a href="support-out-work" ❤️ Support our work!
 
